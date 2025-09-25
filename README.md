@@ -1,29 +1,43 @@
-# tienda
+# TechStore - Tienda Online Vue.js
 
-This template should help get you started developing with Vue 3 in Vite.
+Tienda online desarrollada en Vue.js - Evaluación Final Módulo 6
 
-## Recommended IDE Setup
+## 🚀 Características
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- ✅ Catálogo de productos con búsqueda
+- ✅ Sistema de carrito de compras
+- ✅ Autenticación de usuarios
+- ✅ Diseño responsivo y profesional
+- ✅ Gestión de stock
+- ✅ Navegación con Vue Router
 
-## Customize configuration
+## 🛠️ Tecnologías
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+- Vue.js 3
+- Vue Router 4
+- Vite
+- JavaScript ES6+
+- CSS3 con gradientes y animaciones
 
-## Project Setup
+## 🔧 Instalación
 
 ```sh
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+## 🏃‍♂️ Desarrollo
 
 ```sh
 npm run dev
 ```
 
-### Compile and Minify for Production
+## 📦 Producción
 
 ```sh
 npm run build
 ```
+
+## 🔐 Credenciales Demo
+
+- **Email:** usuario1@mitienda.com
+- **Password:** password
