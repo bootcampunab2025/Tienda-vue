@@ -1,5 +1,11 @@
 <template>
-  <div class="product-card">
+  <div v-if="!product" class="product-card loading">
+    <div class="loading-content">
+      <div class="loading-spinner-card"></div>
+      <p>Cargando producto...</p>
+    </div>
+  </div>
+  <div v-else class="product-card">
     <div class="product-image-container">
       <img 
         :src="product.image" 
@@ -227,6 +233,7 @@ export default {
   margin-bottom: 1rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -366,6 +373,34 @@ export default {
   border-top: 2px solid white;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.product-card.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  background: #f9fafb;
+}
+
+.loading-content {
+  text-align: center;
+  color: #6b7280;
+}
+
+.loading-spinner-card {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e5e7eb;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
 }
 
 @keyframes spin {

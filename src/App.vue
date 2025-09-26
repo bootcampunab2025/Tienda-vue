@@ -5,7 +5,7 @@
       @toggle-cart="toggleCart" 
     />
     
-    <router-view @add-to-cart="addToCart" />
+    <router-view @add-to-cart="addToCart" :key="$route.fullPath" />
     
     <CartDetail 
       :isVisible="showCart"
@@ -32,7 +32,6 @@ const cartItemsCount = computed(() => {
 const addToCart = (productData) => {
   const { product, quantity } = productData
   
-  // Check if product already exists in cart
   const existingItem = cartItems.value.find(item => item.product.id === product.id)
   
   if (existingItem) {
@@ -86,7 +85,6 @@ onMounted(() => {
   }
 })
 
-// Save cart to localStorage whenever it changes
 watch(cartItems, (newCart) => {
   localStorage.setItem('cart', JSON.stringify(newCart))
 }, { deep: true })
