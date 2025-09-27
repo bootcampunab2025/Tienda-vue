@@ -22,7 +22,7 @@ Tienda online desarrollada en Vue.js - Evaluación Final Módulo 6
 ## 🔧 Instalación
 
 ```sh
-npm install json-server json-server-auth jsonwebtoken
+npm install
 ```
 
 ## 🏃‍♂️ Desarrollo
