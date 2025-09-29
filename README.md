@@ -28,7 +28,7 @@ npm install
 ## 🏃‍♂️ Desarrollo
 
 ```sh
-node server.js
+npm run server
 npm run dev
 ```
 
