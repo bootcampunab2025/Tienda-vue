@@ -1,31 +1,5 @@
 <template>
   <div class="home-view">
-    <div class="hero-section">
-      <div class="hero-content">
-        <h1 class="hero-title">
-          Bienvenido a 
-          <span class="brand-name">TechStore</span>
-        </h1>
-        <p class="hero-subtitle">
-          Descubre la última tecnología con los mejores precios del mercado
-        </p>
-        <div class="hero-stats">
-          <div class="stat-item">
-            <span class="stat-number">{{ products.length }}</span>
-            <span class="stat-label">Productos</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-number">{{ totalStock }}</span>
-            <span class="stat-label">En Stock</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-number">24/7</span>
-            <span class="stat-label">Soporte</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="products-section">
       <Products @add-to-cart="handleAddToCart" />
     </div>
@@ -35,7 +9,7 @@
 <script>
 import { ref, computed, onMounted } from 'vue'
 import Products from '../components/Products.vue'
-import API from '../services/API.js'
+import { API } from '../services/API.js'
 
 export default {
   name: 'Home',
@@ -52,10 +26,10 @@ export default {
 
     const loadProducts = async () => {
       try {
-        const data = await API.all()
+        const data = await API.Products.all()
         products.value = data
       } catch (error) {
-        console.error('Error al cargar productos:', error)
+        products.value = []
       }
     }
 
@@ -189,7 +163,6 @@ export default {
   padding: 2rem 0;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .hero-section {
     padding: 3rem 1rem;

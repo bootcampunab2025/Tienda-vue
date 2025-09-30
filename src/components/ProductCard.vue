@@ -26,8 +26,7 @@
       <p class="product-description">{{ product.description }}</p>
       
       <div class="product-price">
-        <span class="currency">$</span>
-        <span class="amount">{{ formatPrice(product.price) }}</span>
+        <span class="price-amount">{{ formatCurrency(product.price) }}</span>
       </div>
 
       <div class="product-stock">
@@ -86,6 +85,7 @@
 
 <script>
 import { ref, computed } from 'vue'
+import { formatCurrency } from '../utils/currency.js'
 
 export default {
   name: 'ProductCard',
@@ -99,13 +99,6 @@ export default {
   setup(props, { emit }) {
     const quantity = ref(1)
     const isAdding = ref(false)
-
-    const formatPrice = (price) => {
-      return new Intl.NumberFormat('es-CL', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-      }).format(price)
-    }
 
     const validateQuantity = () => {
       if (quantity.value < 1) quantity.value = 1
@@ -129,7 +122,6 @@ export default {
       
       isAdding.value = true
       
-      // Simular delay para better UX
       setTimeout(() => {
         emit('add-to-cart', {
           product: props.product,
@@ -143,7 +135,7 @@ export default {
     }
 
     const showSuccessFeedback = () => {
-      console.log(`Agregado: ${quantity.value}x ${props.product.name}`)
+      // Feedback visual ya está implementado en el botón
     }
 
     const handleImageError = (event) => {
@@ -153,7 +145,7 @@ export default {
     return {
       quantity,
       isAdding,
-      formatPrice,
+      formatCurrency,
       validateQuantity,
       increaseQuantity,
       decreaseQuantity,
@@ -244,17 +236,14 @@ export default {
   margin-bottom: 1rem;
 }
 
-.currency {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #667eea;
-}
-
-.amount {
-  font-size: 2rem;
+.price-amount {
+  font-size: 1.75rem;
   font-weight: 800;
   color: #667eea;
-  margin-left: 0.25rem;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .product-stock {

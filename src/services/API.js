@@ -1,11 +1,31 @@
-const BASE_URL = "http://localhost:3001"; // URL de tu JSON Server
+const BASE_URL = "http://localhost:3001";
 
-class API {
-  // Obtener todos los productos
-  static async all() {
+export const API = {
+  Products: {
+    all() {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const response = await fetch(`${BASE_URL}/products`);
+          if (!response.ok) {
+            throw new Error('Error al cargar productos');
+          }
+          const products = await response.json();
+          setTimeout(() => {
+            resolve(products);
+          }, 500);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    }
+  }
+};
+
+export class Products {
+  static async getAll() {
     try {
       const res = await fetch(`${BASE_URL}/products`);
-      if (!res.ok) throw new Error("Error al obtener los productos");
+      if (!res.ok) throw new Error("Error al obtener productos");
       const data = await res.json();
       return data;
     } catch (err) {
@@ -14,8 +34,7 @@ class API {
     }
   }
 
-  // Obtener un producto por ID
-  static async findById(id) {
+  static async getById(id) {
     try {
       const res = await fetch(`${BASE_URL}/products/${id}`);
       if (!res.ok) throw new Error("Producto no encontrado");
@@ -27,7 +46,6 @@ class API {
     }
   }
 
-  // Opcional: agregar un nuevo producto
   static async create(product) {
     try {
       const res = await fetch(`${BASE_URL}/products`, {
@@ -44,7 +62,6 @@ class API {
     }
   }
 
-  // Opcional: actualizar un producto
   static async update(id, product) {
     try {
       const res = await fetch(`${BASE_URL}/products/${id}`, {
@@ -61,7 +78,6 @@ class API {
     }
   }
 
-  // Opcional: eliminar un producto
   static async delete(id) {
     try {
       const res = await fetch(`${BASE_URL}/products/${id}`, {
