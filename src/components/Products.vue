@@ -52,7 +52,7 @@
 
 <script>
 import { ref, onMounted, computed } from 'vue'
-import API from '../services/API.js'
+import { API } from '../services/API.js'
 import ProductCard from './ProductCard.vue'
 
 export default {
@@ -70,11 +70,15 @@ export default {
     const loadProducts = async () => {
       try {
         loading.value = true
-        const data = await API.all()
+        
+        const data = await API.Products.all()
         products.value = data
         filteredProducts.value = data
+        
       } catch (error) {
         console.error('Error al cargar productos:', error)
+        products.value = []
+        filteredProducts.value = []
       } finally {
         loading.value = false
       }

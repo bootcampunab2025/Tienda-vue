@@ -1,51 +1,80 @@
-import { createRouter, createWebHistory } from "vue-router";
-import jwtDecode from 'jwt-decode';
-import Home from "../views/Home.vue";
-import Login from "../views/Login.vue";
+import { createRouter, createWebHistory } from 'vue-router';
+import Home from '../views/Home.vue';
+import Login from '../views/Login.vue';
 import Dashboard from "../views/Dashboard.vue";
-
+import Cart from '../views/Cart.vue';
+import StockManagement from '../views/StockManagement.vue';
+import jwtDecode from 'jwt-decode';
 
 const routes = [
-  { path: "/", name: "Home", component: Home },
-  { path: "/home", name: "HomeAlt", component: Home },
-  { path: "/login", name: "Login", component: Login },
-  { path: "/dashboard", name: "Dashboard", component: Dashboard, meta: { requiresAuth: true } },
+  {
+    path: '/',
+    name: 'Home',
+    component: Home
+  },
+  {
+    path: '/home',
+    redirect: '/'
+  },
+  {
+    path: '/cart',
+    name: 'Cart',
+    component: Cart
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login
+  },
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: Dashboard,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/admin/stocks',
+    name: 'StockManagement',
+    component: StockManagement,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  }
 ];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
+  routes
 });
 
 router.beforeEach((to, from, next) => {
-  console.log("Navigating to:", to.fullPath);
+  console.log('🚦 Router Guard - Navegando a:', to.path)
   const token = localStorage.getItem("token");
-  console.log("Token:", token);
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  
+  console.log('🔑 Token presente:', !!token)
+  console.log('👤 Usuario:', user)
 
   if (to.meta.requiresAuth) {
-    console.log("requiresAuth");
-    if (!token) {
-      console.log("No token, redirect to /login");
+    console.log('🔐 Ruta requiere autenticación')
+    
+    if (!token || !user.email) {
+      console.log('❌ Sin token o usuario, redirigiendo a login')
       return next("/login");
     }    
-console.log("token");
 
-    try {
-      const decoded = jwtDecode(token);
-      const now = Date.now() / 1000;
-      console.log("Token exp:", decoded.exp, "Now:", now);
-
-      if (decoded.exp < now) {
-        localStorage.removeItem("token");
-        return next("/login");
+    // Verificar si la ruta requiere permisos de administrador
+    if (to.meta.requiresAdmin) {
+      console.log('👑 Ruta requiere permisos de admin')
+      console.log('� Email del usuario:', user.email)
+      
+      if (user.email !== "admin@tienda.com") {
+        console.log('❌ Usuario no es admin, redirigiendo a home')
+        return next("/home");
       }
-    } catch (err) {
-      console.log("error");
-      console.log(err);
-      localStorage.removeItem("token");
-      return next("/login");
+      console.log('✅ Usuario autorizado como admin')
     }
   }
+  
+  console.log('✅ Navegación autorizada')
   next();
 });
 

@@ -23,7 +23,8 @@
       </div>
 
       <div class="nav-actions">
-        <button @click="toggleCart" class="cart-btn">
+        <!-- Botón del Carrito -->
+        <router-link to="/cart" class="cart-btn">
           <svg class="cart-icon" viewBox="0 0 24 24" fill="none">
             <path d="M3 3H5l2 13h11l4-8H7" stroke="currentColor" stroke-width="2"/>
             <circle cx="9" cy="21" r="1" stroke="currentColor" stroke-width="2"/>
@@ -31,7 +32,7 @@
           </svg>
           <span class="cart-count" v-if="cartItemsCount > 0">{{ cartItemsCount }}</span>
           <span class="cart-text">Carrito</span>
-        </button>
+        </router-link>
 
         <div class="user-menu">
           <router-link v-if="!isAuthenticated" to="/login" class="login-btn">
@@ -55,6 +56,17 @@
             </button>
             
             <div v-if="showUserMenu" class="dropdown-menu">
+              <router-link 
+                v-if="isAdmin" 
+                to="/admin/stocks" 
+                class="dropdown-item"
+                @click="showUserMenu = false"
+              >
+                <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M9 1v6" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                Gestión de Stocks
+              </router-link>
               <button @click="handleLogout" class="dropdown-item">
                 <svg class="dropdown-icon" viewBox="0 0 24 24" fill="none">
                   <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2"/>
@@ -70,32 +82,34 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, inject } from 'vue'
 import { useRouter } from 'vue-router'
 import Auth from '../services/Auth.js'
 
 export default {
   name: 'Navbar',
-  emits: ['toggle-cart'],
-  props: {
-    cartItemsCount: {
-      type: Number,
-      default: 0
-    }
-  },
-  setup(props, { emit }) {
+  setup() {
     const router = useRouter()
     const isAuthenticated = ref(false)
     const currentUser = ref(null)
     const showUserMenu = ref(false)
+    
+    // Inyectar el carrito desde App.vue
+    const cartItems = inject('cartItems', ref([]))
+    
+    // Computed para el contador del carrito
+    const cartItemsCount = computed(() => {
+      return cartItems.value.reduce((total, item) => total + item.quantity, 0)
+    })
+
+    // Computed para verificar si es administrador
+    const isAdmin = computed(() => {
+      return currentUser.value && currentUser.value.email === 'admin@tienda.com'
+    })
 
     const checkAuthStatus = () => {
       isAuthenticated.value = Auth.isAuthenticated()
       currentUser.value = Auth.getCurrentUser()
-    }
-
-    const toggleCart = () => {
-      emit('toggle-cart')
     }
 
     const toggleUserMenu = () => {
@@ -139,7 +153,8 @@ export default {
       isAuthenticated,
       currentUser,
       showUserMenu,
-      toggleCart,
+      cartItemsCount,
+      isAdmin,
       toggleUserMenu,
       handleLogout
     }
@@ -243,6 +258,7 @@ export default {
   transition: all 0.2s ease;
   position: relative;
   font-weight: 500;
+  text-decoration: none;
 }
 
 .cart-btn:hover {
@@ -357,11 +373,23 @@ export default {
   cursor: pointer;
   transition: background-color 0.2s ease;
   font-weight: 500;
+  text-decoration: none;
 }
 
 .dropdown-item:hover {
   background: #f3f4f6;
   color: #ef4444;
+}
+
+/* Estilo especial para el enlace de administración */
+.dropdown-item[href="/admin/stocks"] {
+  border-bottom: 1px solid #e5e7eb;
+  color: #7c3aed;
+}
+
+.dropdown-item[href="/admin/stocks"]:hover {
+  background: #f3f4f6;
+  color: #5b21b6;
 }
 
 .dropdown-icon {

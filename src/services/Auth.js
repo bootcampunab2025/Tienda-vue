@@ -1,44 +1,94 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
-// Ref reactivo para token global
 export const token = ref(localStorage.getItem("token") || "");
 
 const router = useRouter();
-const BASE_URL = "http://localhost:3001"; // URL de tu JSON Server
+const BASE_URL = "http://localhost:3001";
+
+const validUsers = [
+  {
+    email: "usuario1@mitienda.com",
+    password: "password",
+    name: "Usuario Demo",
+  },
+  {
+    email: "admin@tienda.com", 
+    password: "password",
+    name: "Administrador",
+    role: "admin"
+  }
+];
+
+const validUser = validUsers[0]; // Para compatibilidad
 
 export default class Auth {
-  // Login usando únicamente el backend
   static async login({ email, password }) {
     try {
+      // Primero intentar login con servidor
       const res = await fetch(`${BASE_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err?.message || "Error de login");
+      if (res.ok) {
+        const data = await res.json();
+        
+        // Guardar token y datos de usuario
+        localStorage.setItem("token", data.accessToken);
+        localStorage.setItem("user", JSON.stringify({
+          id: data.user?.id || null,
+          name: data.user?.name || "",
+          email: email,
+          role: data.user?.role || "user"
+        }));
+        token.value = data.accessToken;
+
+        return {
+          id: data.user?.id || null,
+          name: data.user?.name || "",
+          email: email,
+          token: data.accessToken,
+          role: data.user?.role || "user"
+        };
       }
+    } catch (err) {
+      console.log("Servidor no disponible, intentando login local...");
+    }
 
-      const data = await res.json();
-      console.log("Respuesta login backend:", data);
+    // Si el servidor falla, intentar con usuarios locales
+    const localUser = validUsers.find(user => 
+      user.email === email && user.password === password
+    );
 
-      // Guardar token en localStorage y ref reactivo
-      localStorage.setItem("token", data.accessToken);
-      token.value = data.accessToken;
+    if (localUser) {
+      // Simular token para usuario local
+      const mockToken = btoa(JSON.stringify({ 
+        email: localUser.email, 
+        exp: Math.floor(Date.now() / 1000) + 3600 // 1 hora
+      }));
+      
+      // Guardar token y datos de usuario
+      localStorage.setItem("token", mockToken);
+      localStorage.setItem("user", JSON.stringify({
+        id: localUser.email === "admin@tienda.com" ? 1 : 2,
+        name: localUser.name,
+        email: localUser.email,
+        role: localUser.role || "user"
+      }));
+      token.value = mockToken;
 
       return {
-        id: data.user?.id || null,
-        name: data.user?.name || "",
-        email: email,
-        token: data.accessToken,
+        id: localUser.email === "admin@tienda.com" ? 1 : 2,
+        name: localUser.name,
+        email: localUser.email,
+        token: mockToken,
+        role: localUser.role || "user"
       };
-    } catch (err) {
-      console.error("Error login:", err);
-      throw err;
     }
+
+    throw new Error("Credenciales inválidas");
   }
 
   static async logout() {
@@ -60,3 +110,25 @@ export default class Auth {
     return !!localStorage.getItem("user");
   }
 }
+
+export const AuthService = {
+  login(credentials) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const user = validUsers.find(u => 
+          u.email === credentials.email && u.password === credentials.password
+        );
+        
+        if (user) {
+          resolve({ 
+            name: user.name, 
+            email: user.email,
+            role: user.role || "user"
+          });
+        } else {
+          reject(new Error("Credenciales inválidas"));
+        }
+      }, 1000);
+    });
+  },
+};

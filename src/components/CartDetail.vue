@@ -32,7 +32,7 @@
             
             <div class="item-details">
               <h4 class="item-name">{{ item.product.name }}</h4>
-              <p class="item-price">${{ formatPrice(item.product.price) }}</p>
+              <p class="item-price">{{ formatCurrency(item.product.price) }}</p>
             </div>
 
             <div class="item-quantity">
@@ -74,11 +74,11 @@
         <div class="cart-summary">
           <div class="summary-row">
             <span>Subtotal ({{ totalItems }} items):</span>
-            <span class="summary-amount">${{ formatPrice(totalPrice) }}</span>
+            <span class="summary-amount">{{ formatCurrency(totalPrice) }}</span>
           </div>
           <div class="summary-row total-row">
             <span>Total:</span>
-            <span class="total-amount">${{ formatPrice(totalPrice) }}</span>
+            <span class="total-amount">{{ formatCurrency(totalPrice) }}</span>
           </div>
         </div>
 
@@ -103,6 +103,7 @@
 
 <script>
 import { computed } from 'vue'
+import { formatCurrency } from '../utils/currency.js'
 
 export default {
   name: 'CartDetail',
@@ -118,13 +119,6 @@ export default {
   },
   emits: ['close', 'update-quantity', 'remove-item', 'clear-cart'],
   setup(props, { emit }) {
-    const formatPrice = (price) => {
-      return new Intl.NumberFormat('es-CL', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-      }).format(price)
-    }
-
     const totalItems = computed(() => {
       return props.cartItems.reduce((total, item) => total + item.quantity, 0)
     })
@@ -155,13 +149,13 @@ export default {
     }
 
     const checkout = () => {
-      alert(`¡Gracias por tu compra!\nTotal: $${formatPrice(totalPrice.value)}\n\nEn una implementación real, esto redirectiría al proceso de pago.`)
+      alert(`¡Gracias por tu compra!\nTotal: ${formatCurrency(totalPrice.value)}\n\nEn una implementación real, esto redirectiría al proceso de pago.`)
       emit('clear-cart')
       emit('close')
     }
 
     return {
-      formatPrice,
+      formatCurrency,
       totalItems,
       totalPrice,
       closeCart,

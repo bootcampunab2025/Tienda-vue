@@ -1,9 +1,6 @@
 <template>
   <div id="app">
-    <Navbar 
-      :cartItemsCount="cartItemsCount" 
-      @toggle-cart="toggleCart" 
-    />
+    <Navbar />
     
     <router-view @add-to-cart="addToCart" :key="$route.fullPath" />
     
@@ -19,12 +16,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, provide } from 'vue'
 import Navbar from './components/Navbar.vue'
 import CartDetail from './components/CartDetail.vue'
 
 const cartItems = ref([])
 const showCart = ref(false)
+
+// Proporcionar el carrito a todos los componentes hijos
+provide('cartItems', cartItems)
 
 const cartItemsCount = computed(() => {
   return cartItems.value.reduce((total, item) => total + item.quantity, 0)
@@ -48,8 +48,6 @@ const addToCart = (productData) => {
       quantity
     })
   }
-  
-  console.log(`Agregado al carrito: ${quantity}x ${product.name}`)
 }
 
 const updateCartQuantity = ({ productId, quantity }) => {
@@ -80,7 +78,7 @@ onMounted(() => {
     try {
       cartItems.value = JSON.parse(savedCart)
     } catch (error) {
-      console.error('Error loading cart from localStorage:', error)
+      cartItems.value = []
     }
   }
 })
@@ -108,14 +106,12 @@ body {
   min-height: 100vh;
 }
 
-/* Utility Classes */
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
 }
 
-/* Scrollbar Styles */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -134,13 +130,11 @@ body {
   background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
 }
 
-/* Selection Styles */
 ::selection {
   background: rgba(102, 126, 234, 0.2);
   color: #1f2937;
 }
 
-/* Focus Styles */
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
@@ -149,12 +143,10 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
-/* Smooth Scrolling */
 html {
   scroll-behavior: smooth;
 }
 
-/* Remove default input styles */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
